@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeSpace Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fafafa;
+        }
+        .chat-container {
+            height: calc(100vh - 250px);
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .message {
+            max-width: 80%;
+            margin: 8px;
+            padding: 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .user-message {
+            background-color: #0095f6;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+        .bot-message {
+            background-color: #efefef;
+            color: #262626;
+            margin-right: auto;
+            border-bottom-left-radius: 4px;
+        }
+        .preview-image {
+            max-width: 300px;
+            max-height: 300px;
+            object-fit: cover;
+            margin-top: 10px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .input-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .gradient-text {
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-6 max-w-2xl">
+        <div class="flex items-center justify-center mb-6">
+            <h1 class="text-4xl font-bold text-center">
+                <span class="gradient-text">SafeSpace</span> 
+                <span class="text-gray-800">Analyzer</span>
+            </h1>
+        </div>
+        
+        <div class="space-y-4">
+            <div class="chat-container overflow-y-auto p-4" id="chatContainer">
+                <div class="message bot-message">
+                    Welcome to SafeSpace Analyzer! I can help you analyze content for potential threats, cyberbullying, and illegal material. 
+                    Share text, upload an image, or both to get started.
+                </div>
+            </div>
+
+            <div class="input-container p-4">
+                <form id="chatForm" class="space-y-4">
+                    <div class="relative">
+                        <textarea 
+                            id="messageInput" 
+                            class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                            rows="2" 
+                            placeholder="Share Message..."></textarea>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-2">
+                            <label class="flex-1">
+                                <div class="flex items-center justify-center w-full px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                                    <svg class="w-5 h-5 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-sm text-gray-600">Add Photo</span>
+                                </div>
+                                <input 
+                                    type="file" 
+                                    id="imageInput" 
+                                    accept="image/*" 
+                                    class="hidden">
+                            </label>
+                        </div>
+                        
+                        <div id="imagePreview" class="hidden">
+                            <img id="preview" class="preview-image" src="" alt="Preview">
+                        </div>
+
+                        <button 
+                            type="submit" 
+                            class="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white px-6 py-2 rounded-lg hover:opacity-90 transition-opacity font-medium">
+                            Analyze Content
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatForm = document.getElementById('chatForm');
+        const chatContainer = document.getElementById('chatContainer');
+        const messageInput = document.getElementById('messageInput');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImage = document.getElementById('preview');
+
+        function addMessage(message, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.textContent = message;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Preview image when selected
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    imagePreview.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.classList.add('hidden');
+            }
+        });
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const text = messageInput.value.trim();
+            const file = imageInput.files[0];
+
+            if (!text && !file) {
+                addMessage('Please share some content to analyze.', false);
+                return;
+            }
+
+            // Add user message to chat
+            if (text) {
+                addMessage(text, true);
+            }
+            if (file) {
+                addMessage('📷 Image shared for analysis', true);
+            }
+            messageInput.value = '';
+
+            const formData = new FormData();
+            if (text) {
+                formData.append('text', text);
+            }
+            if (file) {
+                formData.append('image', file);
+            }
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    addMessage(`❌ Error: ${data.error}`);
+                } else {
+                    addMessage(data.result);
+                }
+            } catch (error) {
+                addMessage('❌ Error connecting to the server. Please try again.');
+            }
+
+            // Clear inputs
+            imageInput.value = '';
+            imagePreview.classList.add('hidden');
+        });
+    </script>
+</body>
+</html> 
+</html> 
