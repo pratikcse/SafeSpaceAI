@@ -21,8 +21,7 @@ def analyze_content(text=None, image_path=None):
             with open(image_path, 'rb') as image_file:
                 image_data = base64.b64encode(image_file.read()).decode('utf-8')
                 response = model.generate_content([
-                    "Analyze this text and image for threat level (0-10), cyberbullying (0-10), and illegal content (0-10). "
-                    "Format response as: Threat: X, Cyberbullying: Y, Illegal: Z",
+                    "You are a content safety expert. Rate the following [text/image] on a scale of 0 to 10 for (1) Threat Level, (2) Cyberbullying Likelihood, and (3) Potentially Illegal Nature. Respond only in this exact format: Threat: X, Cyberbullying: Y, Illegal: Z",
                     text,
                     {"mime_type": "image/jpeg", "data": image_data}
                 ])
@@ -30,14 +29,12 @@ def analyze_content(text=None, image_path=None):
             with open(image_path, 'rb') as image_file:
                 image_data = base64.b64encode(image_file.read()).decode('utf-8')
                 response = model.generate_content([
-                    "Analyze this image for threat level (0-10), cyberbullying (0-10), and illegal content (0-10). "
-                    "Format response as: Threat: X, Cyberbullying: Y, Illegal: Z",
+                    "You are a content safety expert. Rate the following [text/image] on a scale of 0 to 10 for (1) Threat Level, (2) Cyberbullying Likelihood, and (3) Potentially Illegal Nature. Respond only in this exact format: Threat: X, Cyberbullying: Y, Illegal: Z",
                     {"mime_type": "image/jpeg", "data": image_data}
                 ])
         else:
             response = model.generate_content([
-                "Analyze this text for threat level (0-10), cyberbullying (0-10), and illegal content (0-10). "
-                "Format response as: Threat: X, Cyberbullying: Y, Illegal: Z",
+                "You are a content safety expert. Rate the following [text/image] on a scale of 0 to 10 for (1) Threat Level, (2) Cyberbullying Likelihood, and (3) Potentially Illegal Nature. Respond only in this exact format: Threat: X, Cyberbullying: Y, Illegal: Z",
                 text
             ])
         return response.text
