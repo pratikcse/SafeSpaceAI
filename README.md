@@ -102,19 +102,7 @@ Threat: 6, Cyberbullying: 2, Illegal: 0
 
 This is displayed back in the UI as a bot message.
 
----
 
-## 🔗 Live Demo / Hosted (Optional)
-
-Coming Soon...
-
----
-
-## 📹 YouTube Demo
-
-[Watch the Demo Video](https://youtube.com/your-demo-link)
-
----
 
 ## 🧩 How to Integrate into Social Media Platforms
 
